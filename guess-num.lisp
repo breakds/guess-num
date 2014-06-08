@@ -74,8 +74,8 @@
                       (type "search")
                       (placeholder "  e.g. 1234")
                       (class-name "topcoat-search-input")))
-             (:button ((class-name "topcoat-button")
-                       (type "submit")) "Submit")))
+             (:button ((class-name "topcoat-button--cta")
+                       (type "submit")) "Guess")))
 
 (def-widget game-record ()
     ()
@@ -86,7 +86,7 @@
 (def-realispic-app (guess-num-app :title "Guess Number"
 				  :libs ("http://fb.me/react-0.10.0.min.js"
 					 "http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
-                                  :css ("http://cdnjs.cloudflare.com/ajax/libs/topcoat/0.8.0/css/topcoat-desktop-light.min.css")
+                                  :css ("http://cdnjs.cloudflare.com/ajax/libs/topcoat/0.8.0/css/topcoat-mobile-light.min.css")
 				  :document-base (asdf:system-source-directory 'guess-num)
                                   :port 14386)
   (let ((input-data (array (create number "1234" hint "1A1B")
