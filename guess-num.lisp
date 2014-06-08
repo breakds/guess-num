@@ -43,8 +43,9 @@
 	  (hunchentoot:session-value 'records))
     (reverse (hunchentoot:session-value 'records))))
 
-(def-widget game-box ((records (array)))
-    ((handle-submit (data)
+(def-widget game-box ()
+    ((state (records (array)))
+     (handle-submit (data)
                     (with-rpc (calculate-hint (@ data text))
 		      (chain this (set-state (create records 
 						     rpc-result)))
@@ -60,13 +61,13 @@
 			(lambda (record)
 			  (:game-record ((number (@ record number))
 					 (hint (@ record hint))))))))
-            (:interaction-area ((on-submit (@ this handle-submit))))))
+            (:interaction-area ((process-guess (@ this handle-submit))))))
 
-(def-widget interaction-area ()
+(def-widget interaction-area (process-guess)
     ((handle-submit ()
-                    (chain this props 
-                           (on-submit (create text 
-                                              (chain (local-node text-num) value (trim)))))
+                    (process-guess (create text 
+					   (chain (local-node text-num) 
+						  value (trim))))
                     (setf (@ (local-node text-num) value) "")
                     false))
   #jsx(:form ((on-submit (@ this handle-submit)))
@@ -77,23 +78,26 @@
              (:button ((class-name "topcoat-button--cta")
                        (type "submit")) "Guess")))
 
-(def-widget game-record ()
+(def-widget game-record (number hint)
     ()
   #jsx(:li ((class-name "topcoat-list__item"))
-	   (+ (@ this props number) " " (@ this props hint))))
-
+	   (:span ((style (create "font-size" "20px")))
+		  (+ number "  "))
+	   (:span ((class-name "topcoat-notification"))
+		  hint)))
 
 (def-realispic-app (guess-num-app :title "Guess Number"
-				  :libs ("http://fb.me/react-0.10.0.min.js"
-					 "http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
-                                  :css ("http://cdnjs.cloudflare.com/ajax/libs/topcoat/0.8.0/css/topcoat-mobile-light.min.css")
+				  ;; :libs ("http://fb.me/react-0.10.0.js"
+				  ;; 	 "http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+                                  ;; :css ("http://cdnjs.cloudflare.com/ajax/libs/topcoat/0.8.0/css/topcoat-mobile-light.min.css")
+				  :libs ("/react-0.10.0.js"
+					 "/jquery.js")
+				  :css ("/topcoat-mobile-light.css")
 				  :document-base (asdf:system-source-directory 'guess-num)
                                   :port 14386)
-  (let ((input-data (array (create number "1234" hint "1A1B")
-                           (create number "2345" hint "3A0B"))))
-    (with-rpc (initialize)
-      (chain console (log rpc-result)))
-    #jsx(:game-box ((data input-data)))))
+  (with-rpc (initialize)
+    (chain console (log rpc-result)))
+  #jsx(:game-box))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (disable-jsx-reader))
